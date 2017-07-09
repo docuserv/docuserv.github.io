@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="description" content="DocuSign Developer 101 Labs" />
+		<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+		<link rel="stylesheet" href="/css/base.css" type="text/css" />
+		<title>DocuSign Developer 101 Labs</title>
+	</head>
+	<body>
+		<h1>DocuSign Developer 101 Labs</h1>
+		<h2 id="prereqs">Pre-Requisites</h2>
+		<ul>
+			<li>Register for a Free DocuSign Developer account at <a href="https://secure.docusign.com/signup/developer">https://secure.docusign.com/signup/developer</a></li>
+			<li>Download &amp; Install the free <a href="https://www.getpostman.com/">Postman</a> App on your machine</li>
+		</ul>
+		<h2 id="links">Useful Links</h2>
+		<ul>
+			<li>DocuSign Developer Center: <a href="https://www.docusign.com/developer-center">https://www.docusign.com/developer-center</a></li>
+			<li>&#8220;Old&#8221; REST API Guide: <a href="https://www.docusign.com/p/RESTAPIGuide/RESTAPIGuide.htm">https://www.docusign.com/p/RESTAPIGuide/RESTAPIGuide.htm</a></li>
+			<li>&#8220;New&#8221; REST API Guide: <a href="https://docs.docusign.com/esign/">https://docs.docusign.com/esign/</a></li>
+			<li>SOAP API Guide: <a href="https://www.docusign.com/p/APIGuide/APIGuide.htm">https://www.docusign.com/p/APIGuide/APIGuide.htm</a></li>
+			<li>IODocs: <a href="https://iodocs.docusign.com/">https://iodocs.docusign.com/</a></li>
+			<li>API Explorer: <a href="https://apiexplorer.docusign.com/">https://apiexplorer.docusign.com/</a></li>
+		</ul>
+		<h2 id="toc">Table of Contents</h2>
+		<ul>
+			<li><a href="#createkey">Create your DocuSign Integrator Key</a></li>
+			<li><a href="#authentication">Prepare your X-DocuSign-Authentication header value</a></li>
+			<li><a href="#accountId">Find your DocuSign account number</a></li>
+			<li><a href="#lab1">Lab 1: &#8220;Login&#8221; to DocuSign via REST</a></li>
+			<li><a href="#lab2">Lab 2: Send a DocuSign envelope via REST</a></li>
+			<li><a href="#lab3">Lab 3: Get a list of DocuSign templates via REST in XML</a></li>
+			<li><a href="#lab4">Lab 4: Get a DocuSign template via SOAP</a></li>
+			<li><a href="#lab5">Lab 5: Get recipient names from DocuSign via REST</a></li>
+			<li><a href="#lab6">Lab 6: Get a Recipient View from DocuSign via REST</a></li>
+			<li><a href="#lab7">Lab 7: Get the status of a DocuSign envelope via SOAP</a></li>
+			<li><a href="#lab8">Lab 8: Void a DocuSign envelope via REST</a></li>
+			<li><a href="#lab9">Lab 9: Correct a DocuSign envelope via REST</a></li>
+		</ul>
+		<h2 id="createkey">Create your DocuSign Integrator Key</h2>
+		<p>Please follow the steps below to create an integrator key in your Developer account. If you don't have a Demo account, please <a href="https://secure.docusign.com/signup/develop">sign up for a free developer account</a>, and you will be sent an activation email message.</p>
+		<p>Once you have activated your Developer account:</p>
+		<ul>
+			<li>Log into your account, via <a href="https://demo.docusign.net/">https://demo.docusign.net/</a></li>
+			<li>Select the option to "Go to Admin" from the dropdown menu by your profile image (top-right)<br/><img src="/images/go-to-admin.png"/></li>
+			<li>Under INTEGRATIONS, select the "API and Keys" option</li>
+			<li>Click the ADD INTEGRATOR KEY button</li>
+			<li>Enter an App Description for your integration, then click on the ADD button<br/><img src="/images/add-integrator-key.png"/></li>
+			<li>Copy and Paste into a text editor the following items from the page:</li>
+				<ul>
+					<li>API Username</li>
+					<li>Integrator Key</li>
+				</ul>
+			</li>
+		</ul>
+		<h2 id="authentication">Prepare your X-DocuSign-Authentication header value</h2>
+		<p>The X-DocuSign-Authentication header will be used throughout the rest of the labs in the Developer 101 course, and incorporates:</p>
+		<ul>
+			<li>Your username (recommended to use the API Username seen when creating your DocuSign integrator key)</li>
+			<li>Your password (recommended to use the API Password - see <a href="/how-to/get-api-password.html">Get your DocuSign API Password</a>)</li>
+			<li>Your integrator key</li>
+		</ul>
+		<p>The value for the X-DocuSign-Authentication header can be specified in XML or JSON format:</p>
+		<p>JSON: <strong>{"Username":"</strong><em>username</em><strong>", "Password":"</strong><em>password</em><strong>", "IntegratorKey":"</strong><em>integratorKey</em><strong>"}</strong></p>
+		<p>XML: <strong>&lt;DocuSignCredentials&gt;&lt;Username&gt;</strong><em>username</em><strong>&lt;/Username&gt;&lt;Password&gt;</strong><em>password</em><strong>&lt;/Password&gt;&lt;IntegratorKey&gt;</strong><em>integratorKey</em><strong>&lt;/IntegratorKey&gt;&lt;/DocuSignCredentials&gt;</strong></p>
+		<h2 id="accountId">Find your DocuSign account number</h2>
+		<p>Throughout the labs below, you should replace the {{accountId}} reference with your DocuSign account number. This can be found by:</p>
+		<ul>
+			<li>Log into your account, via <a href="https://demo.docusign.net/">https://demo.docusign.net/</a></li>
+			<li>Click the dropdown menu by your profile image (top-right), and note the number that appears below your email address<br/><img src="/images/account-number.png"/></li>
+		</ul>
+		<h2 id="lab1">Lab 1: &#8220;Login&#8221; to DocuSign via REST</h2>
+		<p>Open the Postman app, and specify the following information:</p>
+		<table>
+			<thead>
+				<tr><th colspan="2">Request Type and URL</th></tr>
+				<tr><td>Verb</td><td>GET</td></tr>
+				<tr><td>Request URL</td><td>https://demo.docusign.net/restapi/v2/login_information</td></tr>
+			</thead>
+			<tbody>
+				<tr><th colspan="2">HTTP Header</th></tr>
+				<tr><td>X-DocuSign-Authentication</td><td><a href="#authentication">your value</td></tr>
+				<tr><td>Accept</td><td>application/json</td></tr>
+			</tbody>
+		</table>
+		<p>Click on the Send button, your response should look something like:</p>
+		<p><img src="/images/lab1.png"/></p>
+		<p>If you see a response similar to the above, then you're done; congratulations! If not, see if you can work out what happened based on the response.</p>
+		<h2 id="lab2">Lab 2: Send a DocuSign envelope via REST</h2>
+		<p>Download the IRS Form 4506-T from <a href="https://www.irs.gov/pub/irs-pdf/f4506t.pdf">https://www.irs.gov/pub/irs-pdf/f4506t.pdf</a></p>
+		<p>Log into your Demo account, via <a href="https://demo.docusign.net/">https://demo.docusign.net/</a></p>
+		<p>Create a new template based on the IRS Form 4506-T by:</p>
+		<ol>
+			<li>Navigate to "TEMPLATES" from the top-level DocuSign menu</li>
+			<li>Select NEW -> Create Template</li>
+			<li>Specify youe Template Name and Description</li>
+			<li>UPLOAD the IRS Form 4506-T PDF document you downloaded previously</li>
+			<li>Specify the Role for the first recipient as "TaxPayer"</li>
+			<li>Change the email subject from &#8220;Please DocuSign: f4506t.pdf&#8221; to &#8220;Please DocuSign the IRS T-4506 form&#8221;</li>
+			<li>Change the email message to text of your choice</li>
+			<li>Click the NEXT button at the top-right</li>
+			<li>Assign the PDF form fields to the TaxPayer role<br/><img src="/images/assign-to-taxpayer.png"/></li>
+			<li>Drag-and-drop a Signature field from the Standard Fields palette on to page 2 of the document<br/><img src="/images/place-signature-field.png"/></li>
+			<li>Click the SAVE AND CLOSE button at the top-right</li>
+			<li>Your template should be shown in the &#8220;My Templates&#8221; folder</li>
+			<li>Click on the template name to view the template</li>
+			<li>Click the ID for your template, by clicking on the information icon next to the template name<br/<img src="/images/get-template-id.png"/></li>
+		</ol>
+		<p>Open the Postman app, and specify the following information:</p>
+		<table>
+			<thead>
+				<tr><th colspan="2">Request Type and URL</th></tr>
+				<tr><td>Verb</td><td>POST</td></tr>
+				<tr><td>Request URL</td><td>https://demo.docusign.net/restapi/v2/accounts/<a href="#accountId">{{accountId}}</a>/envelopes</td></tr>
+			</thead>
+			<tbody>
+				<tr><th colspan="2">HTTP Header</th></tr>
+				<tr><td>X-DocuSign-Authentication</td><td><a href="#authentication">your value</td></tr>
+				<tr><td>Accept</td><td>application/json</td></tr>
+				<tr><td>Content-Type</td><td>multipart/form-data;boundary=AAA</td></tr>
+				<tr><th colspan="2">HTTP Body</th></tr>
+				<tr><td colspan="2">Select the raw data type</td></tr>
+				<tr><td>Content</td><td><code>--AAA<br/>
+Content-Type: application/json<br/>
+Content-Disposition: form-data<br/>
+<br/>
+{<br/>
+&nbsp;&nbsp;"emailSubject": "DocuSign Envelope Sent in 10 minutes - T-4506",<br/>
+&nbsp;&nbsp;"templateId": "[replace with your template ID]",<br/>
+&nbsp;&nbsp;"templateRoles": [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"roleName": "TaxPayer",<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": "[replace with your name]",<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"email":  "[replace with your email address]"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;],<br/>
+&nbsp;&nbsp;"status": "sent"<br/>
+}<br/>
+<br/>
+--AAA--</code></td></tr>
+			</tbody>
+		</table>
+		<p>Click on the Send button, your response should look something like:</p>
+		<p><img src="/images/lab2.png"/></p>
+		<p>If you see a response similar to the above, then you're done; congratulations! If not, see if you can work out what happened based on the response.</p>
+		<h2 id="lab3">Lab 3: Get a list of DocuSign templates via REST in XML</h2>
+		<p>Open the Postman app, and specify the following information:</p>
+		<table>
+			<thead>
+				<tr><th colspan="2">Request Type and URL</th></tr>
+				<tr><td>Verb</td><td>GET</td></tr>
+				<tr><td>Request URL</td><td>https://demo.docusign.net/restapi/v2/accounts/<a href="#accountId">{{accountId}}</a>/templates.xml</td></tr>
+			</thead>
+			<tbody>
+				<tr><th colspan="2">HTTP Header</th></tr>
+				<tr><td>X-DocuSign-Authentication</td><td><a href="#authentication">your value</td></tr>
+				<tr><td>Accept</td><td>application/xml</td></tr>
+			</tbody>
+		</table>
+		<p>Click on the Send button, your response should look something like:</p>
+		<p><img src="/images/lab3.png"/></p>
+		<p>If you see a response similar to the above, then you're done; congratulations! If not, see if you can work out what happened based on the response.</p>
+		<h2 id="lab4">Lab 4: Get a DocuSign template via SOAP</h2>
+		<p>Open the Postman app, and specify the following information:</p>
+		<table>
+			<thead>
+				<tr><th colspan="2">Request Type and URL</th></tr>
+				<tr><td>Verb</td><td>POST</td></tr>
+				<tr><td>Request URL</td><td>https://demo.docusign.net/api/3.0/dsapi.asmx</td></tr>
+			</thead>
+			<tbody>
+				<tr><th colspan="2">HTTP Header</th></tr>
+				<tr><td>X-DocuSign-Authentication</td><td><a href="#authentication">your value</td></tr>
+				<tr><td>Accept</td><td>application/xml</td></tr>
+				<tr><td>Content-Type</td><td>text/xml; charset=utf-8</td></tr>
+				<tr><td>SOAPAction</td><td>http://www.docusign.net/API/3.0/RequestTemplate</td></tr>
+				<tr><th colspan="2">HTTP Body</th></tr>
+				<tr><td colspan="2">Select the raw data type</td></tr>
+				<tr><td>Content</td><td><code>&lt;soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"&gt;<br/>
+&nbsp;&nbsp;&lt;soap:Body&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;RequestTemplate xmlns="http://www.docusign.net/API/3.0"&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;TemplateID&gt;[replace with your template ID]&lt;/TemplateID&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;IncludeDocumentBytes&gt;true&lt;/IncludeDocumentBytes&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/RequestTemplate&gt;<br/>
+&nbsp;&nbsp;&lt;/soap:Body&gt;<br/>
+&lt;/soap:Envelope&gt;</code></td></tr>
+			</tbody>
+		</table>
+		<p>Click on the Send button, your response should look something like:</p>
+		<p><img src="/images/lab4.png"/></p>
+		<p>If you see a response similar to the above, then you're done; congratulations! If not, see if you can work out what happened based on the response.</p>
+		<h2 id="lab5">Lab 5: Get recipient names from DocuSign via REST</h2>
+		<p>Open the Postman app, and specify the following information:</p>
+		<table>
+			<thead>
+				<tr><th colspan="2">Request Type and URL</th></tr>
+				<tr><td>Verb</td><td>GET</td></tr>
+				<tr><td>Request URL</td><td>https://demo.docusign.net/restapi/v2/accounts/<a href="#accountId">{{accountId}}</a>/recipient_names?email=dev101@docusign.org.uk</td></tr>
+			</thead>
+			<tbody>
+				<tr><th colspan="2">HTTP Header</th></tr>
+				<tr><td>X-DocuSign-Authentication</td><td><a href="#authentication">your value</td></tr>
+				<tr><td>Accept</td><td>application/json</td></tr>
+			</tbody>
+		</table>
+		<p>Click on the Send button, your response should look something like:</p>
+		<p><img src="/images/lab5.png"/></p>
+		<p>If you see a response similar to the above, then you're done; congratulations! If not, see if you can work out what happened based on the response.</p>
+		<h2 id="lab6">Lab 6: Get a Recipient View from DocuSign via REST</h2>
+		<p>Open the Postman app, and specify the following information:</p>
+		<table>
+			<thead>
+				<tr><th colspan="2">Request Type and URL</th></tr>
+				<tr><td>Verb</td><td>POST</td></tr>
+				<tr><td>Request URL</td><td>https://demo.docusign.net/restapi/v2/accounts/<a href="#accountId">{{accountId}}</a>/envelopes</td></tr>
+			</thead>
+			<tbody>
+				<tr><th colspan="2">HTTP Header</th></tr>
+				<tr><td>X-DocuSign-Authentication</td><td><a href="#authentication">your value</td></tr>
+				<tr><td>Accept</td><td>application/json</td></tr>
+				<tr><td>Content-Type</td><td>multipart/form-data;boundary=AAA</td></tr>
+				<tr><th colspan="2">HTTP Body</th></tr>
+				<tr><td colspan="2">Select the raw data type</td></tr>
+				<tr><td>Content</td><td><code>--AAA<br/>
+Content-Type: application/json<br/>
+Content-Disposition: form-data<br/>
+<br/>
+{<br/>
+&nbsp;&nbsp;"emailSubject": "DocuSign Envelope Sent in 10 minutes - T-4506",<br/>
+&nbsp;&nbsp;"templateId": "[replace with your template ID]",<br/>
+&nbsp;&nbsp;"templateRoles": [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"roleName": "TaxPayer",<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": "[replace with your name]",<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"email":  "[replace with your email address]",<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"clientUserId": "[replace with your unique identifier for the signer]"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;],<br/>
+&nbsp;&nbsp;"status": "sent"<br/>
+}<br/>
+<br/>
+--AAA--</code></td></tr>
+			</tbody>
+		</table>
+		<p>Click on the Send button, your response should look something like:</p>
+		<p><img src="/images/lab6a.png"/></p>
+		<p>If you see a response similar to the above, then copy the returned envelopeId, we're going to need it next. If not, see if you can work out what happened based on the response.</p>
+		<p>In the Postman app, create a new request and specify the following information:</p>
+		<table>
+			<thead>
+				<tr><th colspan="2">Request Type and URL</th></tr>
+				<tr><td>Verb</td><td>POST</td></tr>
+				<tr><td>Request URL</td><td>https://demo.docusign.net/restapi/v2/accounts/<a href="#accountId">{{accountId}}</a>/envelopes/{{envelopeId}}/views/recipient</td></tr>
+			</thead>
+			<tbody>
+				<tr><th colspan="2">HTTP Header</th></tr>
+				<tr><td>X-DocuSign-Authentication</td><td><a href="#authentication">your value</td></tr>
+				<tr><td>Accept</td><td>application/json</td></tr>
+				<tr><td>Content-Type</td><td>application/json</td></tr>
+				<tr><th colspan="2">HTTP Body</th></tr>
+				<tr><td colspan="2">Select the raw data type</td></tr>
+				<tr><td>Content</td><td><code>{<br/>
+&nbsp;&nbsp;"authenticationMethod": "Password",<br/>
+&nbsp;&nbsp;"email": "[replace with your email]",<br/>
+&nbsp;&nbsp;"returnUrl": "[replace with your http(s) site url like https://www.google.com/]",<br/>
+&nbsp;&nbsp;"userName": "[replace with your name]",<br/>
+&nbsp;&nbsp;"clientUserId": "[replace with your unique identifier for the signer]"<br/>
+}</code></td></tr>
+			</tbody>
+		</table>
+		<p>Click on the Send button, your response should look something like:</p>
+		<p><img src="/images/lab6b.png"/></p>
+		<p>If you see a response similar to the above, then:</p>
+		<ul>
+			<li>Copy the returned URL (tip: switch the response into "Raw" mode so that Postman doesn't try to launch the URL itself)</li>
+			<li>Open a browser</li>
+			<li>Paste the copied URL</li>
+			<li>Sign the document</li>
+		</ul>
+		<p>If not, see if you can work out what happened based on the response.</p>
+		<h2 id="lab7">Lab 7: Get the status of a DocuSign envelope via SOAP</h2>
+		<p>First, we need to find the Envelope ID for one of the envelopes previously created, if you haven't made note of one then:</p>
+		<ul>
+			<li>Log into your account, via <a href="https://demo.docusign.net/">https://demo.docusign.net/</a></li>
+			<li>Select one of your sent envelopes (in the DOCUMENTS section)</li>
+			<li>View the history of the envelope, the value you see for "DocumentID" is also the Envelope ID<br/><img src="/images/lab7a.png"/></li>
+		</ul>
+		<p>Open the Postman app, and specify the following information:</p>
+		<table>
+			<thead>
+				<tr><th colspan="2">Request Type and URL</th></tr>
+				<tr><td>Verb</td><td>POST</td></tr>
+				<tr><td>Request URL</td><td>https://demo.docusign.net/api/3.0/dsapi.asmx</td></tr>
+			</thead>
+			<tbody>
+				<tr><th colspan="2">HTTP Header</th></tr>
+				<tr><td>X-DocuSign-Authentication</td><td><a href="#authentication">your value</td></tr>
+				<tr><td>Accept</td><td>application/xml</td></tr>
+				<tr><td>Content-Type</td><td>text/xml; charset=utf-8</td></tr>
+				<tr><td>SOAPAction</td><td>http://www.docusign.net/API/3.0/RequestStatusEx</td></tr>
+				<tr><th colspan="2">HTTP Body</th></tr>
+				<tr><td colspan="2">Select the raw data type</td></tr>
+				<tr><td>Content</td><td><code>&lt;soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"&gt;<br/>
+&nbsp;&nbsp;&lt;soap:Body&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;RequestStatusEx xmlns="http://www.docusign.net/API/3.0"&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;EnvelopeID&gt;[replace with your envelope ID]&lt;/EnvelopeID&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/RequestStatusEx&gt;<br/>
+&nbsp;&nbsp;&lt;/soap:Body&gt;<br/>
+&lt;/soap:Envelope&gt;</code></td></tr>
+			</tbody>
+		</table>
+		<p>Click on the Send button, your response should look something like:</p>
+		<p><img src="/images/lab7b.png"/></p>
+		<p>If you see a response similar to the above, then you're done; congratulations! If not, see if you can work out what happened based on the response.</p>
+		<h2 id="lab8">Lab 8: Void a DocuSign envelope via REST</h2>
+		<p>First, we need to find the Envelope ID for one of the envelopes previously created (that is still in progress), if you haven't made note of one then:</p>
+		<ul>
+			<li>Log into your account, via <a href="https://demo.docusign.net/">https://demo.docusign.net/</a></li>
+			<li>Select one of your sent envelopes (in the DOCUMENTS section)</li>
+			<li>View the history of the envelope, the value you see for "DocumentID" is also the Envelope ID<br/><img src="/images/lab7a.png"/></li>
+		</ul>
+		<p>Open the Postman app, and specify the following information:</p>
+		<table>
+			<thead>
+				<tr><th colspan="2">Request Type and URL</th></tr>
+				<tr><td>Verb</td><td>PUT</td></tr>
+				<tr><td>Request URL</td><td>https://demo.docusign.net/restapi/v2/accounts/<a href="#accountId">{{accountId}}</a>/envelopes/{{envelopeId}}</td></tr>
+			</thead>
+			<tbody>
+				<tr><th colspan="2">HTTP Header</th></tr>
+				<tr><td>X-DocuSign-Authentication</td><td><a href="#authentication">your value</td></tr>
+				<tr><td>Accept</td><td>application/json</td></tr>
+				<tr><td>Content-Type</td><td>application/json</td></tr>
+				<tr><th colspan="2">HTTP Body</th></tr>
+				<tr><td colspan="2">Select the raw data type</td></tr>
+				<tr><td>Content</td><td><code>{<br/>
+&nbsp;&nbsp;"status": "voided",<br/>
+&nbsp;&nbsp;"voidedReason": "Invalid offer"<br/>
+}</code></td></tr>
+			</tbody>
+		</table>
+		<p>Click on the Send button, your response should look something like:</p>
+		<p><img src="/images/lab8.png"/></p>
+		<p>If you see a response similar to the above, then you're done; congratulations! If not, see if you can work out what happened based on the response.</p>
+		<h2 id="lab9">Lab 9: Correct a DocuSign envelope via REST</h2>
+		<p>First, we need to find the Envelope ID for one of the envelopes previously created (that is still in progress), if you haven't made note of one then:</p>
+		<ul>
+			<li>Log into your account, via <a href="https://demo.docusign.net/">https://demo.docusign.net/</a></li>
+			<li>Select one of your sent envelopes (in the DOCUMENTS section)</li>
+			<li>View the history of the envelope, the value you see for "DocumentID" is also the Envelope ID<br/><img src="/images/lab7a.png"/></li>
+		</ul>
+		<p>Open the Postman app, and specify the following information:</p>
+		<table>
+			<thead>
+				<tr><th colspan="2">Request Type and URL</th></tr>
+				<tr><td>Verb</td><td>PUT</td></tr>
+				<tr><td>Request URL</td><td>https://demo.docusign.net/restapi/v2/accounts/<a href="#accountId">{{accountId}}</a>/envelopes/{{envelopeId}}/recipients</td></tr>
+			</thead>
+			<tbody>
+				<tr><th colspan="2">HTTP Header</th></tr>
+				<tr><td>X-DocuSign-Authentication</td><td><a href="#authentication">your value</td></tr>
+				<tr><td>Accept</td><td>application/json</td></tr>
+				<tr><td>Content-Type</td><td>application/json</td></tr>
+				<tr><th colspan="2">HTTP Body</th></tr>
+				<tr><td colspan="2">Select the raw data type</td></tr>
+				<tr><td>Content</td><td><code>{<br/>
+&nbsp;&nbsp;"signers": [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"recipientId": "1",<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": "Dev One-o-One (corrected)",<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"email": "dev101@docusign.org.uk"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;]<br/>
+}</code></td></tr>
+			</tbody>
+		</table>
+		<p>Click on the Send button, your response should look something like:</p>
+		<p><img src="/images/lab9.png"/></p>
+		<p>If you see a response similar to the above, then you're done; congratulations! If not, see if you can work out what happened based on the response.</p>
+	</body>
+</html>
+

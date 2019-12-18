@@ -1,0 +1,38 @@
+-<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="description" content="Create &amp; Use your DocuSign Integrator Key" />
+		<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+		<link rel="stylesheet" href="/css/base.css" type="text/css" />
+		<title>Create &amp; Use your DocuSign Integrator Key</title>
+	</head>
+	<body>
+		<h1>Create &amp; Use your DocuSign Integrator Key</h1>
+		<h2 id="createkey">Create your DocuSign Integrator Key</h2>
+		<p>Please follow the steps below to create an integrator key in your Developer account. If you don't have a Demo account, please <a href="https://secure.docusign.com/signup/develop">sign up for a free developer account</a>, and you will be sent an activation email message.</p>
+		<p>Once you have activated your Developer account:</p>
+		<ul>
+			<li>Log into your account, via <a href="https://demo.docusign.net/">https://demo.docusign.net/</a></li>
+			<li>Select the option to "Go to Admin" from the dropdown menu by your profile image (top-right)<br/><img src="/images/go-to-admin.png"/></li>
+			<li>Under INTEGRATIONS, select the "API and Keys" option</li>
+			<li>Click the ADD INTEGRATOR KEY button</li>
+			<li>Enter an App Description for your integration, then click on the ADD button<br/><img src="/images/add-integrator-key.png"/></li>
+			<li>Copy and Paste into a text editor the following items from the page:</li>
+				<ul>
+					<li>API Username</li>
+					<li>Integrator Key</li>
+				</ul>
+			</li>
+		</ul>
+		<h2 id="authentication">Prepare your X-DocuSign-Authentication header value</h2>
+		<p>The X-DocuSign-Authentication header is used as part of any HTTP(S) request to the DocuSign Web Service APIs, and incorporates:</p>
+		<ul>
+			<li>Your username (recommended to use the API Username seen when creating your DocuSign integrator key)</li>
+			<li>Your password (recommended to use the API Password - see <a href="/how-to/get-api-password.html">Get your DocuSign API Password</a>)</li>
+			<li>Your integrator key</li>
+		</ul>
+		<p>The value for the X-DocuSign-Authentication header can be specified in XML or JSON format:</p>
+		<p>JSON: <strong>{"Username":"</strong><em>username</em><strong>", "Password":"</strong><em>password</em><strong>", "IntegratorKey":"</strong><em>integratorKey</em><strong>"}</strong></p>
+		<p>XML: <strong>&lt;DocuSignCredentials&gt;&lt;Username&gt;</strong><em>username</em><strong>&lt;/Username&gt;&lt;Password&gt;</strong><em>password</em><strong>&lt;/Password&gt;&lt;IntegratorKey&gt;</strong><em>integratorKey</em><strong>&lt;/IntegratorKey&gt;&lt;/DocuSignCredentials&gt;</strong></p>
+	</body>
+</html>
